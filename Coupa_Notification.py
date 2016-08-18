@@ -11,7 +11,7 @@ from selenium.webdriver.common.action_chains import ActionChains
 # it demonstrates logging in and out of Coupa
 # it also sets notifications for the user either ON or OFF depending on the true/false in
 # the "select the notifications online & email" section of the code below
-# testing again
+# ***** test last attempt
 
 browser=webdriver.Firefox()
 browser.implicitly_wait(1)
