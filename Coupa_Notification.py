@@ -12,6 +12,10 @@ from selenium.webdriver.common.action_chains import ActionChains
 # it also sets notifications for the user either ON or OFF depending on the true/false in
 # the "select the notifications online & email" section of the code below
 # 123xyzabc
+# testing again
+# applying a new comment
+# more new comments
+
 
 browser=webdriver.Firefox()
 browser.implicitly_wait(1)
