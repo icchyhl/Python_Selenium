@@ -6,6 +6,7 @@ import time
 import openpyxl
 
 # this script loops through the IDs in Coupa Expense Delegates excel file and does something
+StartTime = time.time()
 
 browser = webdriver.Firefox()
 browser.get('https://deloitte-ca2.coupacloud.com/session')
@@ -24,7 +25,9 @@ wb = openpyxl.load_workbook('Coupa_Expense_Delegates.xlsx')
 sh = wb.get_sheet_by_name('Sheet1')
 MaxRow = sh.max_row
 
-for x in range(1,MaxRow+1):
+print("Max Row = %s" % MaxRow)
+
+for x in range(2,MaxRow+1):
     AccountID = sh.cell(row=x, column=1).value
     print(AccountID)
     browser.get('https://deloitte-ca2.coupacloud.com/user/edit_user/%s' % AccountID)
@@ -33,6 +36,8 @@ for x in range(1,MaxRow+1):
 
     FullName = sh.cell(row=x, column=2).value
     browser.find_element_by_id('user_can_delegate_expenses_to_ids_name').send_keys(FullName)
+
+    print(time.time() - StartTime)
 
     for y in range(1,10):
         try:
@@ -44,6 +49,8 @@ for x in range(1,MaxRow+1):
         except:
             pass
 
+    wb.save('Coupa_Expense_Delegate_Output.xlsx')
+
 browser.close()
 wb.save('Coupa_Expense_Delegate_Output.xlsx')
-
+print(time.time() - StartTime)
