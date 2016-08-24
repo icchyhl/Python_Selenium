@@ -17,7 +17,7 @@ StartTime = time.time()
 browser=webdriver.Firefox()
 browser.implicitly_wait(1)
 
-wb = openpyxl.load_workbook('Coupa_Notifications.xlsx')
+wb = openpyxl.load_workbook('Coupa_Notifications_Input.xlsx')
 sh = wb.get_sheet_by_name('Sheet1')
 MaxRow = sh.max_row
 
@@ -46,7 +46,7 @@ for x in range(2,MaxRow+1):
         print(Requisition_Notification_Email)
 
         # ===== select the notifications online & email =====
-        if Requisition_Notification_Online is False:
+        if Requisition_Notification_Online is True:
             browser.find_element_by_xpath("//div[@class='section'][1]/div[@class='inline_form_element']/input[1]").click()
         if Requisition_Notification_Email is False:
             browser.find_element_by_xpath("//div[@class='section'][1]/div[@class='inline_form_element']/input[2]").click()

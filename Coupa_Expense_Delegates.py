@@ -21,7 +21,7 @@ browser.find_element_by_id('user_login').send_keys(Login)
 browser.find_element_by_id('user_password').send_keys(Password)
 browser.find_element_by_class_name('button').click()
 
-wb = openpyxl.load_workbook('Coupa_Expense_Delegates.xlsx')
+wb = openpyxl.load_workbook('Coupa_Expense_Delegates_Input.xlsx')
 sh = wb.get_sheet_by_name('Sheet1')
 MaxRow = sh.max_row
 
