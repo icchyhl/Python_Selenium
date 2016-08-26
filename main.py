@@ -127,14 +127,48 @@ class searchCatalogs(unittest.TestCase):
         self.sheetLocation('Requisition Creation',8,8)
 
         driver = self.driver
-        # nextButtonXpath = "//div[@id='item_content']/div[@class='catalog_footer']/div[@class='search_paginator']/em[@class='current']"
         nextButtonClass = "next_page"
         currentPageClass = 'current'
 
         nextButtonElement = WebDriverWait(driver, 10).until(lambda driver: driver.find_element_by_class_name(nextButtonClass))
         nextButtonElement.click()
         currentPageElement = WebDriverWait(driver, 10).until(lambda driver: driver.find_element_by_class_name(currentPageClass))
-        assert currentPageElement.text == 2 # upon clicking next page, the current page should indicate "2"
+        assert currentPageElement.text == '2' # upon clicking next page, the current page should indicate "2"
+
+    def test_0500_SelectItem(self):
+        """
+        step "RC21.5": Click on the first item to see the details
+        """
+        self.sheetLocation('Requisition Creation', 9, 8)
+
+        driver = self.driver
+        firstItemXpath = "//div[@class='item-title'][1]"
+        itemDescriptionXpath = "//div[@id='item_content']//div[@class='item_description']/div[@class='item_info']"
+
+        firstItemElement = WebDriverWait(driver, 10).until(lambda driver: driver.find_element_by_xpath(firstItemXpath))
+        firstItemElement.click()
+        itemDescriptionElement = WebDriverWait(driver, 10).until(lambda driver: driver.find_element_by_xpath(itemDescriptionXpath))
+        assert len(itemDescriptionElement.text) > 0 # ensure there is content in the item description area
+
+    def test_0600_AddtoCart(self):
+        """
+        step "RC21.6": Click "add to Cart" to add this item in your cart
+        """
+        self.sheetLocation('Requisition Creation', 10, 8)
+
+        driver = self.driver
+        addtoCartXpath = "//button[@class='button green'][@type='submit']"
+        selectCartID = 'cart'
+        cartHeaderID = 'pageHeader'
+        itemNameXpath = "//span[@class='info']"
+
+        addtoCartElement = WebDriverWait(driver, 10).until(lambda driver: driver.find_element_by_xpath(addtoCartXpath))
+        addtoCartElement.click()
+        selectCartElement = WebDriverWait(driver, 10).until(lambda driver: driver.find_element_by_id(selectCartID))
+        selectCartElement.click()
+        WebDriverWait(driver, 10).until(lambda driver: driver.find_element_by_id(cartHeaderID))
+        itemNameElements =  WebDriverWait(driver, 10).until(lambda driver: driver.find_elements_by_xpath(itemNameXpath))
+        assert len(itemNameElements) > 0 # ensure cart has 1 or more items
 
 if __name__ == "__main__":
     unittest.main(testRunner=runner.TextTestRunner(resultclass=TestResult))
