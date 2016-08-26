@@ -59,7 +59,7 @@ class searchCatalogs(unittest.TestCase):
 
     # ============= Beginning of the steps from the test scenario start from below ===========
 
-    def test_Login(self):
+    def test_0100_Login(self):
         """
         step "RC21.1": "Login to Coupa, if you are already logged in,
         Please go to home page of Coupa by clicking home icon right beneath the Company logo"
@@ -85,9 +85,9 @@ class searchCatalogs(unittest.TestCase):
         passwordFieldElement.send_keys(coupaPassword)
         loginButtonElement.click()
         WebDriverWait(driver, 10).until(lambda driver: driver.find_element_by_id(coupaLogoID))
-        assert homeURL in driver.current_url
+        assert homeURL in driver.current_url # ensure URL is on the home page
 
-    def test_OpenCatalog(self):
+    def test_0200_OpenCatalog(self):
         """
         step "RC21.2": On the home page, right under blue ribbon and besides "Webform" hover over "Catalogs"
         """
@@ -100,9 +100,9 @@ class searchCatalogs(unittest.TestCase):
         catalogListElement = WebDriverWait(driver, 10).until(lambda driver: driver.find_element_by_xpath(catalogDropdownXpath))
         catalogListElement.click()
         catalogItemsElements = WebDriverWait(driver, 10).until(lambda driver: driver.find_elements_by_xpath(catalogItemsXpath))
-        assert len(catalogItemsElements) > 0 # ensure more than 1 catagory to pass the test
+        assert len(catalogItemsElements) > 0 # ensure there are 1 or more categories to pass the test
 
-    def test_SelectCatalog(self):
+    def test_0300_SelectCatalog(self):
         """
         step "RC21.3": Click on a catalog named in "Test Input1"
         """
@@ -117,9 +117,24 @@ class searchCatalogs(unittest.TestCase):
 
         catalogTitleElement = WebDriverWait(driver, 10).until(lambda driver: driver.find_element_by_xpath(catalogTitleXpath))
         catalogTitleElement.click()
-
         pageHeaderElement = WebDriverWait(driver, 10).until(lambda driver: driver.find_element_by_id(pageHeaderID))
-        assert testInput1 in pageHeaderElement.text
+        assert testInput1 in pageHeaderElement.text # the page header should have the catagory name indicated in the spreadsheet input
+
+    def test_0400_NextPage(self):
+        """
+        step "RC21.4": Scroll down and on the lower right corner of the page, click on "Next"
+        """
+        self.sheetLocation('Requisition Creation',8,8)
+
+        driver = self.driver
+        # nextButtonXpath = "//div[@id='item_content']/div[@class='catalog_footer']/div[@class='search_paginator']/em[@class='current']"
+        nextButtonClass = "next_page"
+        currentPageClass = 'current'
+
+        nextButtonElement = WebDriverWait(driver, 10).until(lambda driver: driver.find_element_by_class_name(nextButtonClass))
+        nextButtonElement.click()
+        currentPageElement = WebDriverWait(driver, 10).until(lambda driver: driver.find_element_by_class_name(currentPageClass))
+        assert currentPageElement.text == 2 # upon clicking next page, the current page should indicate "2"
 
 if __name__ == "__main__":
     unittest.main(testRunner=runner.TextTestRunner(resultclass=TestResult))
