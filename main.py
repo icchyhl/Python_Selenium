@@ -101,9 +101,25 @@ class searchCatalogs(unittest.TestCase):
         catalogListElement.click()
         catalogItemsElements = WebDriverWait(driver, 10).until(lambda driver: driver.find_elements_by_xpath(catalogItemsXpath))
         assert len(catalogItemsElements) > 0 # ensure more than 1 catagory to pass the test
-        for x in catalogItemsElements:
-            print(x.get_attribute('title'))
 
+    def test_SelectCatalog(self):
+        """
+        step "RC21.3": Click on a catalog named in "Test Input1"
+        """
+        self.sheetLocation('Requisition Creation', 7, 8)
+        wb = self.wb
+        inputSheet = wb.get_sheet_by_name('Requisition Creation')
+        testInput1 = inputSheet.cell(row=7,column=10).value
+
+        driver = self.driver
+        catalogTitleXpath = "//div[@class='purchasing_menu_container catalogs']/ul[@id='catalogs_menu']//a[@title='" + testInput1 + "']"
+        pageHeaderID = 'pageHeader'
+
+        catalogTitleElement = WebDriverWait(driver, 10).until(lambda driver: driver.find_element_by_xpath(catalogTitleXpath))
+        catalogTitleElement.click()
+
+        pageHeaderElement = WebDriverWait(driver, 10).until(lambda driver: driver.find_element_by_id(pageHeaderID))
+        assert testInput1 in pageHeaderElement.text
 
 if __name__ == "__main__":
     unittest.main(testRunner=runner.TextTestRunner(resultclass=TestResult))
