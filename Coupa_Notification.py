@@ -14,8 +14,7 @@ import openpyxl
 
 StartTime = time.time()
 
-browser=webdriver.Firefox()
-browser.implicitly_wait(1)
+driver=webdriver.Chrome()
 
 wb = openpyxl.load_workbook('Coupa_Notifications_Input.xlsx')
 sh = wb.get_sheet_by_name('Sheet1')
@@ -25,44 +24,64 @@ for x in range(2,MaxRow+1):
     print(sh.cell(row=x, column=1).value)
     Login = sh.cell(row=x, column=1).value
     Password = sh.cell(row=x, column=2).value
-    browser.get('https://deloitte-ca2.coupacloud.com/session')
+    driver.get('https://deloitte-ca2.coupacloud.com/session')
 
     try:
-        browser.find_element_by_id('user_login').send_keys(Login)
-        browser.find_element_by_id('user_password').send_keys(Password)
-        browser.find_element_by_class_name('button').click()
-        browser.get('https://deloitte-ca2.coupacloud.com/inbox/preferences')
+        loginElement = WebDriverWait(driver, 10).until(lambda driver: driver.find_element_by_id('user_login'))
+        passwordElement = WebDriverWait(driver, 10).until(lambda driver: driver.find_element_by_id('user_password'))
+        buttonElement = WebDriverWait(driver, 10).until(lambda driver: driver.find_element_by_class_name('button'))
+
+        loginElement.send_keys(Login)
+        passwordElement.send_keys(Password)
+        buttonElement.click()
+
+        driver.get('https://deloitte-ca2.coupacloud.com/inbox/preferences')
     except:
         sh.cell(row=x, column=5).value = "Could not log in"
 
     try:
-        Requisition_Notification_Online = browser.find_element_by_xpath("//div[@class='section'][1]"
+        WebDriverWait(driver, 10).until(lambda driver: driver.find_element_by_xpath("//div[@class='section'][1]"
+                                                                        "/div[@class='inline_form_element']"
+                                                                        "/input[1]"))
+        WebDriverWait(driver, 10).until(lambda driver: driver.find_element_by_xpath("//div[@class='section'][1]"
+                                                                        "/div[@class='inline_form_element']"
+                                                                        "/input[2]"))
+
+        Requisition_Notification_Online = driver.find_element_by_xpath("//div[@class='section'][1]"
                                                                         "/div[@class='inline_form_element']"
                                                                         "/input[1]").is_selected()
-        Requisition_Notification_Email = browser.find_element_by_xpath("//div[@class='section'][1]"
+        Requisition_Notification_Email = driver.find_element_by_xpath("//div[@class='section'][1]"
                                                                        "/div[@class='inline_form_element']"
                                                                        "/input[2]").is_selected()
+
         print(Requisition_Notification_Online)
         print(Requisition_Notification_Email)
 
         # ===== select the notifications online & email =====
         if Requisition_Notification_Online is True:
-            browser.find_element_by_xpath("//div[@class='section'][1]/div[@class='inline_form_element']/input[1]").click()
-        if Requisition_Notification_Email is False:
-            browser.find_element_by_xpath("//div[@class='section'][1]/div[@class='inline_form_element']/input[2]").click()
+            notification1 = WebDriverWait(driver, 10).until(lambda driver: driver.find_element_by_xpath("//div[@class='section'][1]/div[@class='inline_form_element']/input[1]"))
+            notification1.click()
+        if Requisition_Notification_Email is True:
+            notification2 = WebDriverWait(driver, 10).until(lambda driver: driver.find_element_by_xpath("//div[@class='section'][1]/div[@class='inline_form_element']/input[2]"))
+            notification2.click()
         # ====================================================
 
-        Requisition_Notification_Online = browser.find_element_by_xpath("//div[@class='section'][1]"
-                                                                        "/div[@class='inline_form_element']"
-                                                                        "/input[1]").is_selected()
-        Requisition_Notification_Email = browser.find_element_by_xpath("//div[@class='section'][1]"
-                                                                       "/div[@class='inline_form_element']"
-                                                                       "/input[2]").is_selected()
+        Requisition_Notification_Online_Element = WebDriverWait(driver, 10).until(lambda driver: driver.find_element_by_xpath("//div[@class='section'][1]"
+                                                                                                                            "/div[@class='inline_form_element']"
+                                                                                                                            "/input[1]"))
+        Requisition_Notification_Online_Element.is_selected()
 
-        print(Requisition_Notification_Online)
-        print(Requisition_Notification_Email)
 
-        browser.find_element_by_xpath("//button[@class='button blue'][@type='submit']").click()
+        Requisition_Notification_Email_Element = WebDriverWait(driver, 10).until(lambda driver: driver.find_element_by_xpath("//div[@class='section'][1]"
+                                                                                                                           "/div[@class='inline_form_element']"
+                                                                                                                           "/input[2]"))
+        Requisition_Notification_Email_Element.is_selected()
+
+        print(Requisition_Notification_Online_Element.is_selected())
+        print(Requisition_Notification_Email_Element.is_selected())
+
+        blueButtonElement = WebDriverWait(driver, 10).until(lambda driver: driver.find_element_by_xpath("//button[@class='button blue'][@type='submit']"))
+        blueButtonElement.click()
         sh.cell(row=x, column=3).value = "Configured"
 
     except:
@@ -71,8 +90,13 @@ for x in range(2,MaxRow+1):
 
     try:
         # ==== LOG OUT =========
-        ActionChains(browser).move_to_element(browser.find_element_by_id('my_account')).perform()
-        browser.find_element_by_xpath('//a[@href="' + "/sessions/destroy" + '"]').click()
+        myAccountElement = WebDriverWait(driver, 10).until(lambda driver: driver.find_element_by_id('my_account'))
+        logoutHover = ActionChains(driver).move_to_element(myAccountElement)
+        logoutHover.perform()
+        time.sleep(1)
+        logoutElement =  WebDriverWait(driver, 10).until(
+            lambda driver: driver.find_element_by_xpath("//a[@title='Sign Out'][@href='/sessions/destroy']"))
+        logoutElement.click()
         # ======================
     except:
         sh.cell(row=x, column=4).value = "Could not log out"
@@ -81,6 +105,6 @@ for x in range(2,MaxRow+1):
     print(time.time() - StartTime)
     wb.save('Notifications_OutputX.xlsx')
 
-browser.close()
+driver.close()
 wb.save('Notifications_OutputX.xlsx')
 print(time.time() - StartTime)
