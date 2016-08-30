@@ -9,7 +9,7 @@ import openpyxl
 # updating invoices enmass to flag the 'paid' flag to checked (yes) for
 # a list of invoices in a spreadsheet that are not already flagged
 
-StartTime = time.time()
+StartTime = time.time() 
 
 wb = openpyxl.load_workbook('Invoice_Update_PaidFlag_Input.xlsx')
 shx = wb.get_sheet_by_name('Login')
