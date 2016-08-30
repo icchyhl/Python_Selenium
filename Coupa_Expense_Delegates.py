@@ -58,6 +58,6 @@ for x in range(2,MaxRow+1):
 
     wb.save('Coupa_Expense_Delegate_Output.xlsx')
 
-driver.close()
+driver.quit()
 wb.save('Coupa_Expense_Delegate_Output.xlsx')
 print(time.time() - StartTime)

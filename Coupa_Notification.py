@@ -105,6 +105,6 @@ for x in range(2,MaxRow+1):
     print(time.time() - StartTime)
     wb.save('Notifications_OutputX.xlsx')
 
-driver.close()
+driver.quit()
 wb.save('Notifications_OutputX.xlsx')
 print(time.time() - StartTime)
