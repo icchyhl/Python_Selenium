@@ -22,6 +22,7 @@ MaxRow = sh.max_row
 
 driver = webdriver.Chrome()
 driver.get(clientURL)
+driver.implicitly_wait(10)
 
 # >>>>>>>>>>>>>> LOGIN >>>>>>>>>>>>>>>
 loginElement = WebDriverWait(driver, 10).until(lambda driver: driver.find_element_by_id('user_login'))
