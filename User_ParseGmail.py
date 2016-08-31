@@ -9,14 +9,25 @@ import openpyxl
 # updating invoices enmass to flag the 'paid' flag to checked (yes) for
 # a list of invoices in a spreadsheet that are not already flagged
 
-StartTime = time.time()
+def test():
+    StartTime = time.time()
 
-wb = openpyxl.load_workbook('User_ParseGmail_Output.xlsx')
-shx = wb.get_sheet_by_name('Login')
-Login = shx.cell(row=2, column=1).value
-Password = shx.cell(row=2, column=2).value
-clientURL = shx.cell(row=2, column = 3).value
+    wb = openpyxl.load_workbook('User_ParseGmail_Output.xlsx')
+    shx = wb.get_sheet_by_name('Login')
+    Email = shx.cell(row=2, column=1).value
+    Password = shx.cell(row=2, column=2).value
 
-driver = webdriver.Chrome()
-driver.get(clientURL)
-driver.implicitly_wait(10)
+    driver = webdriver.Chrome()
+    driver.get('https://accounts.google.com/login')
+    driver.implicitly_wait(10)
+
+    # >>>>>>>>>>>>>> LOGIN >>>>>>>>>>>>>>>
+    emailElement = WebDriverWait(driver, 10).until(lambda driver: driver.find_element_by_id('Email'))
+    emailElement.send_keys(Email + '\n')
+    userPasswordElement = WebDriverWait(driver, 10).until(lambda driver: driver.find_element_by_id('Passwd'))
+    userPasswordElement.send_keys(Password + '\n')
+    driver.get('https://mail.google.com/mail')
+    # <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+
+if __name__ == '__main__':
+    test()
