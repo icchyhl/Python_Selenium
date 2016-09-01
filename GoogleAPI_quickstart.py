@@ -17,6 +17,19 @@ try:
 except ImportError:
     flags = None
 
+# This script is used to pull the password reset emails from a specified GMAIL account and
+# write them to a spreadsheet.
+# Step 1: log into coupa and in Setup>Users import a list of existing or new users with the flag
+#         of 'reset password' as "Yes"
+# Step 2: after import is complete, log into the gmail account used to reset the users (ie. all
+#         users must have the same Gmail account such as Coupa+xxx@gmail.com). Manually move
+#         all of the password emails sent by Coupa into a specified folder. In the example, Label_5
+#         is the ID of the folder used.
+# Step 3: Run the below script and an output file will be created with all the links contained
+# Step 4: Run the 'User_ChangePassword.py' script to loop through all the links and set the
+#         password to a defaulted password
+
+
 wb = openpyxl.load_workbook('GoogleAPI_quickstart_Output.xlsx')
 sh = wb.get_sheet_by_name('Sheet1')
 
