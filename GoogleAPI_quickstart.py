@@ -101,10 +101,14 @@ def main():
             z = base64.urlsafe_b64decode(y['raw'].encode('ASCII'))
             zz = str(z)
             # print(z) # comment this in to get entire string. Below is to parse out the required link
-            beginningTextLocation = re.search('https',zz).start() # starting point of where required link sits in string
-            endingTextLocation = re.search('Your access credentials',zz).start() # ending point of where link sits in string
-            # print(z[beginningTextLocation:endingTextLocation])
-            sh.cell(row=rowNum, column=1).value = zz[beginningTextLocation:endingTextLocation]
+            linkBeginningTextLocation = re.search('https',zz).start() # starting point of where required link sits in string
+            linkEndingTextLocation = re.search('Your access credentials',zz).start() # ending point of where link sits in string
+            # print(z[linkBeginningTextLocation:linkEndingTextLocation])
+            sh.cell(row=rowNum, column=1).value = zz[linkBeginningTextLocation:linkEndingTextLocation]
+            accountBeginningTextLocation = re.search('Username: ',zz).start() # starting point of where required link sits in string
+            accountEndingTextLocation = re.search('Web Address:',zz).start() # ending point of where link sits in string
+            # print(z[linkBeginningTextLocation:linkEndingTextLocation])
+            sh.cell(row=rowNum, column=2).value = zz[accountBeginningTextLocation:accountEndingTextLocation]
             rowNum += 1
         except:
             rowNum += 1
