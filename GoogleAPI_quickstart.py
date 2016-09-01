@@ -1,12 +1,15 @@
-
 from __future__ import print_function
 import httplib2
 import os
-
+from apiclient import errors
 from apiclient import discovery
 import oauth2client
 from oauth2client import client
 from oauth2client import tools
+import base64
+import email
+import re
+import openpyxl
 
 try:
     import argparse
@@ -14,9 +17,14 @@ try:
 except ImportError:
     flags = None
 
+wb = openpyxl.load_workbook('GoogleAPI_quickstart_Output.xlsx')
+sh = wb.get_sheet_by_name('Sheet1')
+
 # If modifying these scopes, delete your previously saved credentials
 # at ~/.credentials/gmail-python-quickstart.json
+
 SCOPES = 'https://www.googleapis.com/auth/gmail.readonly'
+# SCOPES = 'https://www.googleapis.com/auth/gmail.modify'
 CLIENT_SECRET_FILE = 'client_secret.json'
 APPLICATION_NAME = 'Gmail API Python Quickstart'
 
@@ -58,17 +66,52 @@ def main():
     credentials = get_credentials()
     http = credentials.authorize(httplib2.Http())
     service = discovery.build('gmail', 'v1', http=http)
-
     results = service.users().labels().list(userId='me').execute()
     labels = results.get('labels', [])
+    max_Results = ''
+    labels_ID = 'Label_5' # specify the label ID after pulling it via the label prints to console below
+    query = ''
 
     if not labels:
         print('No labels found.')
     else:
-      print('Labels:')
-      for label in labels:
-        print(label['name'])
+        print('Labels:')
+        for label in labels:
+            print(label['id'] + ' ' + label['name'])
 
+    response = service.users().messages().list(userId='me',
+                                               labelIds = labels_ID
+                                               ).execute()
+    messages = []
+    if 'messages' in response:
+        messages.extend(response['messages'])
+
+    while 'nextPageToken' in response:
+        page_token = response['nextPageToken']
+        response = service.users().messages().list(userId='me',
+                                                   pageToken=page_token,
+                                                   labelIds = labels_ID
+                                                   ).execute()
+        messages.extend(response['messages'])
+
+    rowNum = 1 # starting row of the spreadsheet
+    for x in messages: # the piece of code to pull and parse the messages
+        try:
+            y = service.users().messages().get(userId='me', id=x['id'],format='raw').execute()
+            z = base64.urlsafe_b64decode(y['raw'].encode('ASCII'))
+            zz = str(z)
+            # print(z) # comment this in to get entire string. Below is to parse out the required link
+            beginningTextLocation = re.search('https',zz).start() # starting point of where required link sits in string
+            endingTextLocation = re.search('Your access credentials',zz).start() # ending point of where link sits in string
+            # print(z[beginningTextLocation:endingTextLocation])
+            sh.cell(row=rowNum, column=1).value = zz[beginningTextLocation:endingTextLocation]
+            rowNum += 1
+        except:
+            rowNum += 1
+            pass
+
+
+    wb.save('GoogleAPI_quickstart_Output.xlsx')
 
 if __name__ == '__main__':
     main()
