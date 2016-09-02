@@ -26,7 +26,7 @@ class TestResult(runner.TextTestResult):
         test.markCell('Success')
         super(TestResult, self).addSuccess(test)
 
-class searchCatalogs(unittest.TestCase):
+class test_0020_SearchCatalogs(unittest.TestCase):
     """
     Test Scenario for (RC21): "Search existing catalogs "
     """
@@ -169,6 +169,67 @@ class searchCatalogs(unittest.TestCase):
         WebDriverWait(driver, 10).until(lambda driver: driver.find_element_by_id(cartHeaderID))
         itemNameElements =  WebDriverWait(driver, 10).until(lambda driver: driver.find_elements_by_xpath(itemNameXpath))
         assert len(itemNameElements) > 0 # ensure cart has 1 or more items
+
+class test_0010_Login(unittest.TestCase):
+    """
+    Test Scenario for (RC21): "Search existing catalogs "
+    """
+    @classmethod
+    def setUpClass(cls):
+        # this will set up the initial values for this class, which the
+        # test runner will do.
+        cls.wb = openpyxl.load_workbook('Main_Input.xlsx')
+        cls.sh_Setup = cls.wb.get_sheet_by_name('Setup')
+        cls.ClientURL = cls.sh_Setup.cell(row=1, column=2).value
+        cls.driver = webdriver.Chrome()
+        cls.driver.get(cls.ClientURL)
+
+    def tearDown(self):
+        # This will save the progress if test scenario is aborted before full execution
+        self.wb.save('Main_Output.xlsx')
+
+    @classmethod
+    def tearDownClass(cls):
+        cls.driver.quit()
+        cls.wb.save('Main_Output.xlsx')
+
+    def sheetLocation(self, sheet, row, col):
+        # initialize the initial value to success first
+        self._sh, self._row, self._col = sheet, row, col
+        self.sh = self.wb.get_sheet_by_name(self._sh)
+
+    def markCell(self, value):
+        self.sh.cell(row=self._row, column=self._col).value = value
+
+    # ============= Beginning of the steps from the test scenario start from below ===========
+
+    def test_0100_Login(self):
+        """
+        step "RC21.1": "Login to Coupa, if you are already logged in,
+        Please go to home page of Coupa by clicking home icon right beneath the Company logo"
+        """
+        self.sheetLocation('User Login',5,8)
+
+        driver = self.driver
+        coupaLogin = self.sh_Setup.cell(row=4, column=1).value
+        coupaPassword = self.sh_Setup.cell(row=4, column=2).value
+        loginFieldID = 'user_login'
+        passwordFieldID = 'user_password'
+        loginButtonClassName = 'button'
+        coupaLogoID = 'global-logo'
+        homeURL = 'user/home'
+
+        loginFieldElement = WebDriverWait(driver, 10).until(lambda driver: driver.find_element_by_id(loginFieldID))
+        passwordFieldElement = WebDriverWait(driver, 10).until(lambda driver: driver.find_element_by_id(passwordFieldID))
+        loginButtonElement = WebDriverWait(driver, 10).until(lambda driver: driver.find_element_by_class_name(loginButtonClassName))
+
+        loginFieldElement.clear()
+        loginFieldElement.send_keys(coupaLogin)
+        passwordFieldElement.clear()
+        passwordFieldElement.send_keys(coupaPassword)
+        loginButtonElement.click()
+        WebDriverWait(driver, 10).until(lambda driver: driver.find_element_by_id(coupaLogoID))
+        assert homeURL in driver.current_url # ensure URL is on the home page
 
 if __name__ == "__main__":
     unittest.main(testRunner=runner.TextTestRunner(resultclass=TestResult))
