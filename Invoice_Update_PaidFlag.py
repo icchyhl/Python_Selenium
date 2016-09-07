@@ -51,14 +51,23 @@ for x in range(2,MaxRow+1):
         "//tr[contains(@id,'invoice_header_row')]//span[@class='dt_open_link']"))
     print('Number of Invoices from search: ' + str(len(firstInvoiceElements)))
     time.sleep(1)
+    WebDriverWait(driver, 2).until(lambda driver: invoiceSearchInput in driver.find_element_by_xpath(
+        "//tr[contains(@id,'invoice_header_row')]//span[@class='dt_open_link']").text) # wait 2s until the invoice # is inside the first search
 
     if len(firstInvoiceElements) == 1: # if only 1 invoice is found form search then click into invoice
         firstInvoiceElement = WebDriverWait(driver, 10).until(lambda driver: driver.find_element_by_xpath(
             "//tr[contains(@id,'invoice_header_row')]//span[@class='dt_open_link']"))
         firstInvoiceElement.click()
 
+        # >>>>>>>>>>>> Assert the invoice clicked is accurate >>>>>>>>>>
+        invoicePageHeaderElement = WebDriverWait(driver, 10).until(lambda driver: driver.find_element_by_id('pageHeader'))
+        invoicePageHeader = invoicePageHeaderElement.text
+        assert invoiceSearchInput in invoicePageHeader
+        # <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+
         # >>>>>>>>> selecting 'paid' >>>>>>>>>>>>
         invoicePaidElement = WebDriverWait(driver, 10).until(lambda driver: driver.find_element_by_id('invoice_paid'))
+        sh.cell(row=x, column=3).value = invoicePaidElement.is_selected()
         print(invoicePaidElement.is_selected())
         if invoicePaidElement.is_selected() is False:  # Update this to TRUE if wanting to change to Paid flag as no
             invoicePaidElement.click()  # checkbox for 'paid'
@@ -68,12 +77,15 @@ for x in range(2,MaxRow+1):
             # wait for invoice page to load = previous invoice was saved
         # <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
 
-            sh.cell(row=x,column=3).value = invoicePaidElement.is_selected()
             sh.cell(row=x, column=2).value = 'Paid checkbox configured'
             wb.save('Invoice_Update_PaidFlag_Output.xlsx')
             print(time.time() - StartTime)
-        else: sh.cell(row=x, column=2).value = 'Paid checkbox was already configured'
-    else: sh.cell(row=x, column=2).value = 'More than 1 invoice returned from search'
+        else:
+            sh.cell(row=x, column=2).value = 'Paid checkbox was already configured'
+            wb.save('Invoice_Update_PaidFlag_Output.xlsx')
+    else:
+        sh.cell(row=x, column=2).value = 'More than 1 invoice returned from search'
+        wb.save('Invoice_Update_PaidFlag_Output.xlsx')
 # <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
 
 wb.save('Invoice_Update_PaidFlag_Output.xlsx')
