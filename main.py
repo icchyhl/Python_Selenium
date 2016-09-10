@@ -124,7 +124,7 @@ class test_0020_SearchCatalogs(unittest.TestCase):
         """
         step "RC21.4": Scroll down and on the lower right corner of the page, click on "Next"
         """
-        self.sheetLocation('Requisition Creation',8,8)
+        self.sheetLocation('Requisition Creation', 8, 8)
 
         driver = self.driver
         nextButtonClass = "next_page"
@@ -232,4 +232,7 @@ class test_0010_Login(unittest.TestCase):
         assert homeURL in driver.current_url # ensure URL is on the home page
 
 if __name__ == "__main__":
+    # unittest.main(defaultTest='test_0010_Login', testRunner=runner.TextTestRunner(resultclass=TestResult))
+    # unittest.main(defaultTest='test_0020_SearchCatalogs', testRunner=runner.TextTestRunner(resultclass=TestResult))
     unittest.main(testRunner=runner.TextTestRunner(resultclass=TestResult))
+    # unittest.main(defaultTest='test_0010_Login')
