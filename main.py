@@ -26,6 +26,17 @@ class TestResult(runner.TextTestResult):
         test.markCell('Success')
         super(TestResult, self).addSuccess(test)
 
+class test_0000_Config(unittest.TestCase):
+    """
+    Use this to configure anything required at the very beginning before any test scenarios are run
+    """
+    def test_spreadsheet_Config(self):
+        self.wb = openpyxl.load_workbook('Main_Input.xlsx')
+        self.wb.save('Main_Output.xlsx')
+
+    def markCell(self, value):
+        pass # script needs to call markCell for config to work
+
 class test_0020_SearchCatalogs(unittest.TestCase):
     """
     Test Scenario for (RC21): "Search existing catalogs "
@@ -34,7 +45,9 @@ class test_0020_SearchCatalogs(unittest.TestCase):
     def setUpClass(cls):
         # this will set up the initial values for this class, which the
         # test runner will do.
-        cls.wb = openpyxl.load_workbook('Main_Input.xlsx')
+        cls.wb = openpyxl.load_workbook('Main_Output.xlsx')
+        if cls.wb.get_sheet_by_name('Requisition Creation').cell(row=4,column=10).value == "Yes":
+            cls.skipTest(cls,test_0010_Login) # Skip entire test scenario if
         cls.sh_Setup = cls.wb.get_sheet_by_name('Setup')
         cls.ClientURL = cls.sh_Setup.cell(row=1, column=2).value
         cls.driver = webdriver.Chrome()
@@ -109,7 +122,7 @@ class test_0020_SearchCatalogs(unittest.TestCase):
         self.sheetLocation('Requisition Creation', 7, 8)
         wb = self.wb
         inputSheet = wb.get_sheet_by_name('Requisition Creation')
-        testInput1 = inputSheet.cell(row=7,column=10).value
+        testInput1 = inputSheet.cell(row=7,column=11).value
 
         driver = self.driver
         catalogTitleXpath = "//div[@class='purchasing_menu_container catalogs']/ul[@id='catalogs_menu']//a[@title='" + testInput1 + "']"
@@ -174,11 +187,14 @@ class test_0010_Login(unittest.TestCase):
     """
     Test Scenario for (RC21): "Search existing catalogs "
     """
+
     @classmethod
     def setUpClass(cls):
         # this will set up the initial values for this class, which the
         # test runner will do.
-        cls.wb = openpyxl.load_workbook('Main_Input.xlsx')
+        cls.wb = openpyxl.load_workbook('Main_Output.xlsx')
+        if cls.wb.get_sheet_by_name('User Login').cell(row=4,column=10).value == "Yes":
+            cls.skipTest(cls,test_0010_Login)
         cls.sh_Setup = cls.wb.get_sheet_by_name('Setup')
         cls.ClientURL = cls.sh_Setup.cell(row=1, column=2).value
         cls.driver = webdriver.Chrome()
